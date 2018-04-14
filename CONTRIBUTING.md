@@ -12,5 +12,5 @@ When contributing to this repository, please first discuss the change you wish t
 1. Provide concise description of the contribution in the pull request itself
 1. Increase the version numbers in any examples files and the README.md to the new version that this
    pull request would represent.
-   The versioning scheme we use is [SemVer](http://semver.org/).
-1. Add bullet point(s) to versioning file [VERSION.md] that represents the content of this pull request.
+   The versioning scheme we use is [Semantic Versioning](http://semver.org/).
+1. Add bullet point(s) to versioning file [VERSION.md](VERSION.md) that represents the content of this pull request.

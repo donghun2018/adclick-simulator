@@ -13,7 +13,7 @@ This software was tested with Python 3.6 running on Windows 10 and Ubuntu 16.04.
 
 #### Python
 
-Anaconda is an easy way to get working python.
+Anaconda is an easy way to get a working python.
 Get it [here](https://www.anaconda.com/download/).
 
 The initial version of the simulator is tested on 64-bit python 3.6 as follows:
@@ -80,8 +80,8 @@ See also the list of [contributors](https://github.com/donghun2018/adclick-simul
 
 ## Acknowledgments
 
-- Weidong Han for many useful feedback and suggestions to improve the software
+- Weidong Han for many useful feedback, suggestions, and contributions to improve the software
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/donghun2018/adclick-simulator/blob/master/LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/donghun2018/adclick-simulator/blob/master/LICENSE) file for details.
