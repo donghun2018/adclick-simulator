@@ -183,18 +183,21 @@ class Simulator:
                               'num_auct': bunch[0]['auctions_in_iter'],
                               'your_bid': bunch[0]['bids'][p_ix],
                               'winning_bid': bunch[0]['winning_bid']}
+                    impressions = []
                     clicks = []
                     costs = []
                     conversions = []
                     revenues = []
                     for ev_b in bunch:
                         if p_ix == ev_b['winning_pol_id']:
+                            impressions.append(1)
                             clicks.append(ev_b['num_click'])
                             costs.append(ev_b['cost_per_click'])
                             conversions.append(ev_b['num_conversion'])
                             revenues.append(ev_b['revenue_per_conversion'])
 
-                    p_add_info = {'num_click': sum(clicks),
+                    p_add_info = {'num_impression': sum(impressions),
+                                  'num_click': sum(clicks),
                                   'cost_per_click': mean(costs) if sum(clicks) > 0 else '',
                                   'num_conversion': sum(conversions),
                                   'revenue_per_conversion': mean(revenues) if sum(conversions) > 0 else ''}
@@ -244,7 +247,7 @@ class Simulator:
 
         wb = Workbook()
         ws = wb.active
-        outs = ['iter', 'attr', 'num_auct', 'your_bid', 'winning_bid', 'num_click', 'cost_per_click',
+        outs = ['iter', 'attr', 'num_auct', 'your_bid', 'winning_bid', 'num_impression', 'num_click', 'cost_per_click',
                 'num_conversion', 'revenue_per_conversion', 'your_profit_cumulative']
         ws.append(outs)
         for p_info_iter in self.p_infos[pol_ix]:
@@ -271,7 +274,7 @@ if __name__ == "__main__":
     sim.read_in_auction(aucts)
 
     print("{:.2f} sec: finished loading simulator".format(time.time() - t_start))
-    for t in range(1000):
+    for t in range(10):
         sim_res = sim.step()
         print("{:.2f} sec: simulation iter {}, auction happened? {}".format(time.time() - t_start, t, sim_res))
 
