@@ -206,7 +206,7 @@ class Simulator:
 
             for ev in events + [{'attr': 'guard_dummy'}]:
                 this_a = ev['attr']
-                if last_a == this_a and ev != events[-1]:
+                if last_a == this_a and ev != 'guard_dummy':
                     bunch.append(ev)
                 else:
                     # aggregate information
@@ -215,20 +215,22 @@ class Simulator:
                               'num_auct': bunch[0]['auctions_in_iter'],
                               'your_bid': bunch[0]['bids'][p_ix],
                               'winning_bid': bunch[0]['winning_bid']}
-                    impressions = []
+                    win_count = []
                     clicks = []
                     costs = []
                     conversions = []
                     revenues = []
                     for ev_b in bunch:
                         if p_ix == ev_b['winning_pol_id']:
-                            impressions.append(1)   # TODO: bug on this? #impr == #clicks  always??
+                            win_count.append(1)   # TODO: bug on this? #impr == #clicks  always??
                             clicks.append(ev_b['num_click'])
                             costs.append(ev_b['cost_per_click'])
                             conversions.append(ev_b['num_conversion'])
                             revenues.append(ev_b['revenue_per_conversion'])
 
-                    p_add_info = {'num_impression': sum(impressions),
+                    approx_num_impression = int(p_info['num_auct']*sum(win_count)/len(bunch))
+
+                    p_add_info = {'num_impression': approx_num_impression,
                                   'num_click': sum(clicks),
                                   'cost_per_click': mean(costs) if sum(clicks) > 0 else '',
                                   'num_conversion': sum(conversions),
