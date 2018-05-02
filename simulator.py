@@ -324,7 +324,7 @@ if __name__ == "__main__":
     sim.read_in_auction(aucts)
 
     print("{:.2f} sec: finished loading simulator".format(time.time() - t_start))
-    for t in range(168):
+    for t in range(param['max iteration']):
         sim_res = sim.step()
         print("{:.2f} sec: simulation iter {}, auction happened? {}".format(time.time() - t_start, t, sim_res))
 
