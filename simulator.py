@@ -222,7 +222,7 @@ class Simulator:
                     revenues = []
                     for ev_b in bunch:
                         if p_ix == ev_b['winning_pol_id']:
-                            win_count.append(1)   # TODO: bug on this? #impr == #clicks  always??
+                            win_count.append(1)
                             clicks.append(ev_b['num_click'])
                             costs.append(ev_b['cost_per_click'])
                             conversions.append(ev_b['num_conversion'])
