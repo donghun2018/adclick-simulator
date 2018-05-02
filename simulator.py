@@ -26,6 +26,7 @@ class Simulator:
 
         :param randseed: seed for the simulator. it is used for click and conversion sampling and tiebreaking
         """
+        self.time_last = time.time()
         self.prng = np.random.RandomState(randseed)
         self.pols, self.puids = None, None
         self.possible_bids = list(range(10))
@@ -36,6 +37,16 @@ class Simulator:
         self.hist = []
         self.events = []
         self.p_infos = {}
+        self.time_spent = {}
+        self._time_log('simulator')
+
+    def _time_log(self, n):
+        t = time.time()
+        if n in self.time_spent.keys():
+            self.time_spent[n] += t - self.time_last
+        else:
+            self.time_spent[n] = t - self.time_last
+        self.time_last = t
 
     def read_in_auction(self, aucts):
         """ reads in output from Auction.generate_sample(), and initializes policies
@@ -43,27 +54,38 @@ class Simulator:
         :param aucts: output from Auction class. The maximum simulate-able iterations depends on this
         :return: none. After running this, it is possible to run the simulation
         """
+        self.time_last = time.time()
+
         self.auctions = aucts
         self.attrs = sorted(list(set([a['attr'] for a in aucts])))
         self.max_t = self.auctions[-1]['iter']
         self._init_pols()
+
+        self._time_log('simulator')
+
 
     def _init_pols(self):
         """
         internal function. Loads and initializes policies
         :return:
         """
+        self.time_last = time.time()
+
         if self.pols is None and self.puids is None and self.attrs != []:
             self.pols, self.puids = sl.load_policies(self.attrs, self.possible_bids, self.max_t)
             self.p_infos = {ix: [] for ix in range(len(self.pols))}
+            for puid in self.puids:
+                self.time_spent[puid] = 0.0
         else:
             pass
+
+        self._time_log('simulator')
 
     def get_num_clicks(self, bid, auct):
         theta = {'a': auct['theta'],
                  'bid': 0,                 # TODO: adjust this with attribute as well?
                  '0': 0,                   # TODO: baseline click probability
-                 'max_click_prob': 0.1}
+                 'max_click_prob': 0.5}
         p_click = sl.get_click_prob(theta, bid)
         num_clicks = self.prng.binomial(auct['num_auct'], p_click)
         return num_clicks, p_click
@@ -73,6 +95,8 @@ class Simulator:
         simulates one timestep in the auction
         :return: True if auction is simulated, False if no auction data is present
         """
+        self.time_last = time.time()
+
         self.t += 1
         auction_happened = False
         events = []
@@ -91,7 +115,14 @@ class Simulator:
                 profits_sum = deepcopy(self.hist[-1]['profits_cumulative'])
 
             auction_happened = True
-            bids = [float(p.bid(a['attr'])) for p in self.pols]
+            # bids = [float(p.bid(a['attr'])) for p in self.pols]
+            bids = []
+            for puid, p in zip(self.puids, self.pols):
+                self._time_log('simulator')
+                this_bid = p.bid(a['attr'])
+                self._time_log(puid)
+                bids.append(float(this_bid))
+
             max_bid_pols_ix = sl.max_ix(bids)
             winning_bid = bids[max_bid_pols_ix[0]]
             num_clicks, p_click = self.get_num_clicks(winning_bid, a)
@@ -152,6 +183,7 @@ class Simulator:
             auct_res['costs_cumulative'] = deepcopy(costs_sum)
             auct_res['revenues_cumulative'] = deepcopy(revenues_sum)
             auct_res['profits_cumulative'] = deepcopy(profits_sum)
+            auct_res['time_spent'] = deepcopy(self.time_spent)
             self.hist.append(auct_res)
             # end of auction events handling
 
@@ -174,7 +206,7 @@ class Simulator:
 
             for ev in events + [{'attr': 'guard_dummy'}]:
                 this_a = ev['attr']
-                if last_a == this_a and ev != events[-1]:
+                if last_a == this_a and ev != 'guard_dummy':
                     bunch.append(ev)
                 else:
                     # aggregate information
@@ -183,20 +215,22 @@ class Simulator:
                               'num_auct': bunch[0]['auctions_in_iter'],
                               'your_bid': bunch[0]['bids'][p_ix],
                               'winning_bid': bunch[0]['winning_bid']}
-                    impressions = []
+                    win_count = []
                     clicks = []
                     costs = []
                     conversions = []
                     revenues = []
                     for ev_b in bunch:
                         if p_ix == ev_b['winning_pol_id']:
-                            impressions.append(1)
+                            win_count.append(1)
                             clicks.append(ev_b['num_click'])
                             costs.append(ev_b['cost_per_click'])
                             conversions.append(ev_b['num_conversion'])
                             revenues.append(ev_b['revenue_per_conversion'])
 
-                    p_add_info = {'num_impression': sum(impressions),
+                    approx_num_impression = int(p_info['num_auct']*sum(win_count)/len(bunch))
+
+                    p_add_info = {'num_impression': approx_num_impression,
                                   'num_click': sum(clicks),
                                   'cost_per_click': mean(costs) if sum(clicks) > 0 else '',
                                   'num_conversion': sum(conversions),
@@ -215,8 +249,15 @@ class Simulator:
 
         # post-auction learning session for policies
         for p_ix, p in enumerate(self.pols):
+            self._time_log('simulator')
             p.learn(p_infos[p_ix])
+            self._time_log(self.puids[p_ix])
+
             self.p_infos[p_ix].append(p_infos[p_ix])
+
+        # finish up
+        self._time_log('simulator')
+        print(self.time_spent)
 
         return auction_happened
 
@@ -234,6 +275,16 @@ class Simulator:
         ws.append(outs),
         for h in self.hist:
             ws.append([str(h[k]) if isinstance(h[k], (list, tuple)) else h[k] for k in outs])
+            # ws.append([str(['{:.2f}'.format(i) for i in h[k] ]) if isinstance(h[k], (list, tuple)) else '{:.2f}'.format(h[k]) for k in outs])
+        wb.save(fname)
+
+    def output_time_logged_to_xlsx(self, fname):
+        wb = Workbook()
+        ws = wb.active
+        outs = ['simulator'] + self.puids
+        ws.append(['t_{}'.format(k) for k in outs])
+        for h in self.hist:
+            ws.append([h['time_spent'][k] for k in outs])
         wb.save(fname)
 
     def output_policy_info_to_xlsx(self, fname, pol_ix):
@@ -260,6 +311,7 @@ class Simulator:
         self.output_hist_to_xlsx("output_master_aggregate.xlsx")
         for ix, puid in enumerate(self.puids):
             self.output_policy_info_to_xlsx("output_policy_info_{}.xlsx".format(puid), ix)
+        self.output_time_logged_to_xlsx("output_time_spent_in_seconds.xlsx")
 
 
 if __name__ == "__main__":
@@ -274,7 +326,7 @@ if __name__ == "__main__":
     sim.read_in_auction(aucts)
 
     print("{:.2f} sec: finished loading simulator".format(time.time() - t_start))
-    for t in range(1000):
+    for t in range(param['max iteration']):
         sim_res = sim.step()
         print("{:.2f} sec: simulation iter {}, auction happened? {}".format(time.time() - t_start, t, sim_res))
 
