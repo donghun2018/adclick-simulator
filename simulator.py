@@ -85,7 +85,7 @@ class Simulator:
         theta = {'a': auct['theta'],
                  'bid': 0,                 # TODO: adjust this with attribute as well?
                  '0': 0,                   # TODO: baseline click probability
-                 'max_click_prob': 0.1}
+                 'max_click_prob': 0.5}
         p_click = sl.get_click_prob(theta, bid)
         num_clicks = self.prng.binomial(auct['num_auct'], p_click)
         return num_clicks, p_click
@@ -222,7 +222,7 @@ class Simulator:
                     revenues = []
                     for ev_b in bunch:
                         if p_ix == ev_b['winning_pol_id']:
-                            impressions.append(1)
+                            impressions.append(1)   # TODO: bug on this? #impr == #clicks  always??
                             clicks.append(ev_b['num_click'])
                             costs.append(ev_b['cost_per_click'])
                             conversions.append(ev_b['num_conversion'])
@@ -273,6 +273,7 @@ class Simulator:
         ws.append(outs),
         for h in self.hist:
             ws.append([str(h[k]) if isinstance(h[k], (list, tuple)) else h[k] for k in outs])
+            # ws.append([str(['{:.2f}'.format(i) for i in h[k] ]) if isinstance(h[k], (list, tuple)) else '{:.2f}'.format(h[k]) for k in outs])
         wb.save(fname)
 
     def output_time_logged_to_xlsx(self, fname):
@@ -323,7 +324,7 @@ if __name__ == "__main__":
     sim.read_in_auction(aucts)
 
     print("{:.2f} sec: finished loading simulator".format(time.time() - t_start))
-    for t in range(10):
+    for t in range(168):
         sim_res = sim.step()
         print("{:.2f} sec: simulation iter {}, auction happened? {}".format(time.time() - t_start, t, sim_res))
 

@@ -52,16 +52,17 @@ class Auction:
             a['values'] = a['values'].split(',')
             if a['lambda'] == 'random':
                 # generates [0,10] bounded scaled beta(2,2) random variable
-                a['lambda'] = list(0 + 10 * self.prng.beta(2,2,size=len(a['values'])))
+                a['lambda'] = list(0 + 100 * self.prng.beta(2,2,size=len(a['values'])))
             if a['theta'] == 'random':
                 # generates [-0.75,0.75] bounded scaled beta(2,2) random variable
                 a['theta'] = list(-0.75 + 1.5 * self.prng.beta(2,2,size=len(a['values'])))
             if a['avg-revenue'] == 'random':
-                # generates [0, 100] bounded scaled beta(2,2) random variable
-                a['avg-revenue'] = list(0 + 100 * self.prng.beta(2,2,size=len(a['values'])))
+                # generates [30, 70] bounded scaled beta(2,2) random variable (after all attributes considered)
+                # this makes avg rev per conversion 50.
+                a['avg-revenue'] = list(30 / len(attrs_input) + 40 / len(attrs_input) * self.prng.beta(2,2,size=len(a['values'])))
             if a['prob-conversion'] == 'random':
-                # generates [0, 0.1/len-attr] bounded scaled beta(2,2) r.v. to limit prob-conversion capped at 0.1
-                a['prob-conversion'] = list(0 + 0.1 / len(attrs_input) * self.prng.beta(2,2,size=len(a['values'])))
+                # generates [0, 0.15/len-attr] bounded scaled beta(2,2) r.v. to limit prob-conversion capped at 0.15
+                a['prob-conversion'] = list(0 + 0.15 / len(attrs_input) * self.prng.beta(2,2,size=len(a['values'])))
 
         return attrs_input
 
@@ -79,7 +80,8 @@ class Auction:
         else:
             if prng is None:
                 prng = np.random.RandomState()
-            r = list(prng.lognormal(mean=0, sigma=np.sqrt(2 * np.log(avg_revenue)), size=size))
+            # r = list(prng.lognormal(mean=0, sigma=np.sqrt(2 * np.log(avg_revenue)), size=size))
+            r = list(prng.gamma(shape=4, scale=avg_revenue/4, size=size))    # lognormal too noisy, use gamma
         return [float(r_elem) for r_elem in r]
 
     @staticmethod
