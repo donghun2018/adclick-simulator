@@ -3,8 +3,6 @@ Simulator library
 
 Donghun Lee 2018
 """
-
-
 import pickle
 
 import numpy as np
@@ -70,3 +68,36 @@ def max_ix(l):
         if item == max_l:
             ret.append(ix)
     return ret
+
+
+def top_K_max(l, K=1, prng=None):
+    """
+    returns K elements such that no element in returned list is less than the largest element of l that are not returned
+    :param l: list
+    :param K: int
+    :param prng: numpy-compatible PRNG, can be obtained from np.random.RandomState()
+    :return: length-K list containing elements, and second return length-K list containing corresponding index in input l
+
+    Note that ties are randomly broken by random.shuffle function from numpy
+    """
+    if prng is None:
+        prng = np.random.RandomState()
+    ret_ix = []
+    l2 = sorted(list(set(l)), reverse=True)
+    for v in l2:
+        print(v)
+        indices = []
+        for ix, item in enumerate(l):
+            if item == v:
+                indices.append(ix)
+        prng.random.shuffle(indices)
+        ret_ix.extend(indices)
+        if len(ret_ix) > K:
+            break
+
+    ret2 = ret_ix[:K]
+    ret1 = [l[i] for i in ret2]
+
+    return ret1, ret2
+
+
