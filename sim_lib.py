@@ -85,12 +85,11 @@ def top_K_max(l, K=1, prng=None):
     ret_ix = []
     l2 = sorted(list(set(l)), reverse=True)
     for v in l2:
-        print(v)
         indices = []
         for ix, item in enumerate(l):
             if item == v:
                 indices.append(ix)
-        prng.random.shuffle(indices)
+        prng.shuffle(indices)
         ret_ix.extend(indices)
         if len(ret_ix) > K:
             break
