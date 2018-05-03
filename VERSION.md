@@ -3,15 +3,19 @@ When contributing, please add concise bullet point summary with proper version i
 
 ## v0.2 (proposed updates)
 
-- (proposed updates)
+### v0.2.0 (dev, working)
 
-## v0.1 (current)
+- bids in 0.1 increments
+- click probability > 0 for non-top bids
+
+## v0.1 
 
 - Development version. API may change.
 
-### v0.1.1
+### v0.1.1 (current)
 
-- (any bugfix)
+- add number of impressions output
+- bugfix on policy outputs
 
 ### v0.1.0
 
