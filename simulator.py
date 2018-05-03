@@ -30,6 +30,8 @@ class Simulator:
         self.prng = np.random.RandomState(randseed)
         self.pols, self.puids = None, None
         self.possible_bids = list(np.linspace(0,10,101))
+        self.num_of_ad_slots = 3
+        self.ad_slot_click_prob_adjuster = []
         self.auctions = None
         self.attrs = []
         self.t = 0
@@ -60,7 +62,11 @@ class Simulator:
         self.attrs = sorted(list(set([a['attr'] for a in aucts])))
         self.max_t = self.auctions[-1]['iter']
         self._init_pols()
-
+        if len(self.pols) < self.num_of_ad_slots:
+            print("number of policies less than number of ad slots. Reducing ad slot counts == number of policies = {}".format(len(self.pols)))
+            self.num_of_ad_slots = len(self.pols)
+        click_prob_adjuster = [(1 / 4) ** i for i in range(self.num_of_ad_slots)]  # geometric decaying click prob adjustment
+        self.ad_slot_click_prob_adjuster = [p / sum(click_prob_adjuster) for p in click_prob_adjuster]
         self._time_log('simulator')
 
 
@@ -125,6 +131,9 @@ class Simulator:
 
             max_bid_pols_ix = sl.max_ix(bids)
             winning_bid = bids[max_bid_pols_ix[0]]
+            # TODO: take top K bids -- as if K slots are there
+            reverse_sorted_bids, sorted_pIx = sl.top_K_max(bids, self.num_of_ad_slots, self.prng)
+            sorted_unique_bids = sorted(list(set(bids)))
             num_clicks, p_click = self.get_num_clicks(winning_bid, a)
             cost = sl.compute_second_price_cost(bids, size=num_clicks)  # second price auction
             conversion = Auction.get_conversion(a['prob_conversion'], self.prng, size=num_clicks)
@@ -133,7 +142,13 @@ class Simulator:
             winning_pol_ix = []
             for ix in range(num_clicks):
                 winner_ix = int(self.prng.choice(max_bid_pols_ix))
+                # TODO: if geometric click prob, then winner_ix is one of top-K bids
+                # TODO: fill K positions with pIx, in non-decreasing order of bids[pIx]
+                # TODO: and choose one of K with custom set probability in geometrically decaying probability
+                # TODO: that chosen one is winner_ix of this click.
+                winner_ix = int(self.prng.choice(sorted_pIx, p=self.ad_slot_click_prob_adjuster))
                 winning_pol_ix.append(winner_ix)
+                # TODO: compute cost (second price) for each click.
                 costs_sum[winner_ix] += 1 * cost[ix]
                 revenues_sum[winner_ix] += conversion[ix] * revenue[ix]
                 profits_sum[winner_ix] = revenues_sum[winner_ix] - costs_sum[winner_ix]
@@ -214,7 +229,7 @@ class Simulator:
                               'attr': bunch[0]['attr'],
                               'num_auct': bunch[0]['auctions_in_iter'],
                               'your_bid': bunch[0]['bids'][p_ix],
-                              'winning_bid': bunch[0]['winning_bid']}
+                              'winning_bid': bunch[0]['winning_bid']}   # TODO: now, winning_bid != max_bid, so make avg_winning_bid
                     win_count = []
                     clicks = []
                     costs = []
