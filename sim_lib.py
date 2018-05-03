@@ -56,6 +56,21 @@ def compute_second_price_cost(bids, size=1):
         return [ubids[0]] * size
 
 
+def _compute_actual_second_price_cost(bid, sorted_unique_bid_list):
+    """
+
+    :param bid: bid price
+    :param sorted_unique_bid_list: MUST BE SORTED AND UNIQUE (increasing order)
+                                   must have bid as its element
+    :return: second price cost (if lowest, then itself)
+    """
+
+    ix = sorted_unique_bid_list.index(bid)
+    cost_ix = 0 if ix == 0 else ix - 1
+    return sorted_unique_bid_list[cost_ix]
+
+
+
 def max_ix(l):
     """ returns all indices of l whose element is the max value
 

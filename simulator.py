@@ -131,7 +131,7 @@ class Simulator:
 
             max_bid_pols_ix = sl.max_ix(bids)
             winning_bid = bids[max_bid_pols_ix[0]]
-            # TODO: take top K bids -- as if K slots are there
+            # take top K bids -- because K slots are there
             reverse_sorted_bids, sorted_pIx = sl.top_K_max(bids, self.num_of_ad_slots, self.prng)
             sorted_unique_bids = sorted(list(set(bids)))
             num_clicks, p_click = self.get_num_clicks(winning_bid, a)
@@ -141,15 +141,18 @@ class Simulator:
 
             winning_pol_ix = []
             for ix in range(num_clicks):
-                winner_ix = int(self.prng.choice(max_bid_pols_ix))
-                # TODO: if geometric click prob, then winner_ix is one of top-K bids
-                # TODO: fill K positions with pIx, in non-decreasing order of bids[pIx]
-                # TODO: and choose one of K with custom set probability in geometrically decaying probability
-                # TODO: that chosen one is winner_ix of this click.
+                # winner_ix = int(self.prng.choice(max_bid_pols_ix))   # max-bidder-wins case
+                # if geometric click prob, then winner_ix is one of top-K bids
+                # fill K positions with pIx, in non-decreasing order of bids[pIx]
+                # and choose one of K with custom set probability in geometrically decaying probability
+                # that chosen one is winner_ix of this click.
                 winner_ix = int(self.prng.choice(sorted_pIx, p=self.ad_slot_click_prob_adjuster))
+                winning_bid = bids[winner_ix]
                 winning_pol_ix.append(winner_ix)
-                # TODO: compute cost (second price) for each click.
-                costs_sum[winner_ix] += 1 * cost[ix]
+                # compute actual cost (second price) for each click (as each click may have different winner than max bidder)
+                actual_cost = sl._compute_actual_second_price_cost(bids[winner_ix], sorted_unique_bids)
+                cost[ix] = actual_cost
+                costs_sum[winner_ix] += cost[ix]
                 revenues_sum[winner_ix] += conversion[ix] * revenue[ix]
                 profits_sum[winner_ix] = revenues_sum[winner_ix] - costs_sum[winner_ix]
                 event = {'iter': self.t,
