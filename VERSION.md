@@ -3,7 +3,8 @@ When contributing, please add concise bullet point summary with proper version i
 
 ## v0.2 (proposed updates)
 
-- (proposed updates)
+- bids in 0.1 increments
+- click probability > 0 for non-top bids
 
 ## v0.1 (current)
 
@@ -11,7 +12,8 @@ When contributing, please add concise bullet point summary with proper version i
 
 ### v0.1.1
 
-- (any bugfix)
+- add number of impressions output
+- bugfix on policy outputs
 
 ### v0.1.0
 
