@@ -31,7 +31,7 @@ class Simulator:
         self.pols, self.puids = None, None
         # self.possible_bids = list(range(10))
         self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
-        self.num_of_ad_slots = 3
+        self.num_of_ad_slots = 8
         self.ad_slot_click_prob_adjuster = []
         self.auctions = None
         self.attrs = []
@@ -66,7 +66,7 @@ class Simulator:
         if len(self.pols) < self.num_of_ad_slots:
             print("number of policies less than number of ad slots. Reducing ad slot counts == number of policies = {}".format(len(self.pols)))
             self.num_of_ad_slots = len(self.pols)
-        click_prob_adjuster = [(1 / 4) ** i for i in range(self.num_of_ad_slots)]  # geometric decaying click prob adjustment
+        click_prob_adjuster = [0.3 * (0.7 ** i) for i in range(self.num_of_ad_slots)]  # geometric decaying click prob adjustment
         self.ad_slot_click_prob_adjuster = [p / sum(click_prob_adjuster) for p in click_prob_adjuster]
         self._time_log('simulator')
 
