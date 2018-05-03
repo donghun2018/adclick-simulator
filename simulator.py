@@ -29,6 +29,7 @@ class Simulator:
         self.time_last = time.time()
         self.prng = np.random.RandomState(randseed)
         self.pols, self.puids = None, None
+        # self.possible_bids = list(range(10))
         self.possible_bids = list(np.linspace(0,10,101))
         self.num_of_ad_slots = 3
         self.ad_slot_click_prob_adjuster = []
@@ -227,12 +228,14 @@ class Simulator:
                 if last_a == this_a and ev != 'guard_dummy':
                     bunch.append(ev)
                 else:
+                    bids_that_got_clicked = [ev['winning_bid'] for ev in bunch]
                     # aggregate information
                     p_info = {'iter': bunch[0]['iter'],
                               'attr': bunch[0]['attr'],
                               'num_auct': bunch[0]['auctions_in_iter'],
                               'your_bid': bunch[0]['bids'][p_ix],
-                              'winning_bid': bunch[0]['winning_bid']}   # TODO: now, winning_bid != max_bid, so make avg_winning_bid
+                              'winning_bid': max(bids_that_got_clicked),
+                              'winning_bid_avg': mean(bids_that_got_clicked)}
                     win_count = []
                     clicks = []
                     costs = []
@@ -316,8 +319,8 @@ class Simulator:
 
         wb = Workbook()
         ws = wb.active
-        outs = ['iter', 'attr', 'num_auct', 'your_bid', 'winning_bid', 'num_impression', 'num_click', 'cost_per_click',
-                'num_conversion', 'revenue_per_conversion', 'your_profit_cumulative']
+        outs = ['iter', 'attr', 'num_auct', 'your_bid', 'winning_bid', 'winning_bid_avg', 'num_impression', 'num_click',
+                'cost_per_click', 'num_conversion', 'revenue_per_conversion', 'your_profit_cumulative']
         ws.append(outs)
         for p_info_iter in self.p_infos[pol_ix]:
             for p_info in p_info_iter:
