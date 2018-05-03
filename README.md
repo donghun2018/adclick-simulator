@@ -2,6 +2,10 @@
 
 This is an Ad-click Auction Simulator that takes multiple bidding policies and emulate running 2nd price auction for sponsored search advertisement placing similar to Google's Ad-click system.
 
+## Get the Newest Code
+
+Downloadable zip and tar.gz files are [here](https://github.com/donghun2018/adclick-simulator/releases). Also, you may clone this repository.
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
