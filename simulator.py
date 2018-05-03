@@ -29,7 +29,7 @@ class Simulator:
         self.time_last = time.time()
         self.prng = np.random.RandomState(randseed)
         self.pols, self.puids = None, None
-        self.possible_bids = list(range(10))
+        self.possible_bids = list(np.linspace(0,10,101))
         self.auctions = None
         self.attrs = []
         self.t = 0
