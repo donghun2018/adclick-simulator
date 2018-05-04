@@ -30,7 +30,7 @@ class Simulator:
         self.prng = np.random.RandomState(randseed)
         self.pols, self.puids = None, None
         self.possible_bids = list(range(10))
-        # self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
+        self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
         self.num_of_ad_slots = 8
         self.ad_slot_click_prob_adjuster = []
         self.auctions = None
