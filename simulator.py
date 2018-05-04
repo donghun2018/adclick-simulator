@@ -29,8 +29,8 @@ class Simulator:
         self.time_last = time.time()
         self.prng = np.random.RandomState(randseed)
         self.pols, self.puids = None, None
-        # self.possible_bids = list(range(10))
-        self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
+        self.possible_bids = list(range(10))
+        # self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
         self.num_of_ad_slots = 8
         self.ad_slot_click_prob_adjuster = []
         self.auctions = None
@@ -255,7 +255,7 @@ class Simulator:
                                   'num_click': sum(clicks),
                                   'cost_per_click': mean(costs) if sum(clicks) > 0 else '',
                                   'num_conversion': sum(conversions),
-                                  'revenue_per_conversion': mean(revenues) if sum(conversions) > 0 else ''}
+                                  'revenue_per_conversion': sum(revenues) / sum(conversions) if sum(conversions) > 0 else ''}
 
                     this_cost = sum([c if c != '' else 0 for c in costs])
                     this_revenue = sum([ncr * rpc for (ncr, rpc) in zip(conversions, [r if r != '' else 0 for r in revenues])])
