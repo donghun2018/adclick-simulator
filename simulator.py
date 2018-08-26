@@ -21,7 +21,7 @@ class Simulator:
     Simulates ad-click auction over time
     """
 
-    def __init__(self, randseed=12345):
+    def __init__(self, randseed=12345, **kwargs):
         """ initializes the auction simulating environment
 
         :param randseed: seed for the simulator. it is used for click and conversion sampling and tiebreaking
@@ -29,7 +29,8 @@ class Simulator:
         self.randseed = randseed
         self.time_last = time.time()
         self.prng = np.random.RandomState(randseed)
-        self.pols, self.puids = None, None
+        self.pols = None
+        self.puids = kwargs['puids'] if 'puids' in kwargs else None
         self.possible_bids = list(range(10))
         # self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
         self.num_of_ad_slots = 8
@@ -79,13 +80,23 @@ class Simulator:
         """
         self.time_last = time.time()
 
-        if self.pols is None and self.puids is None and self.attrs != []:
-            self.pols, self.puids = sl.load_policies(self.attrs, self.possible_bids, self.max_t)
-            self.p_infos = {ix: [] for ix in range(len(self.pols))}
-            for puid in self.puids:
-                self.time_spent[puid] = 0.0
-        else:
-            pass
+        if not self.puids:
+            self.puids = sl.get_puids()
+        if not self.pols:
+            self.pols = sl.load_policies(self.puids, self.attrs, self.possible_bids, self.max_t)
+
+        self.p_infos = {ix: [] for ix in range(len(self.pols))}
+        for puid in self.puids:
+            self.time_spent[puid] = 0.0
+
+        # if self.pols is None and self.puids is None and self.attrs != []:
+        #     self.puids = sl.get_puids()
+        #     self.pols = sl.load_policies(self.puids, self.attrs, self.possible_bids, self.max_t)
+        #     self.p_infos = {ix: [] for ix in range(len(self.pols))}
+        #     for puid in self.puids:
+        #         self.time_spent[puid] = 0.0
+        # else:
+        #     pass
 
         self._time_log('simulator')
 

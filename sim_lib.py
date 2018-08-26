@@ -20,14 +20,14 @@ def load_auction_p(fname):
     return pickle.load(open(fname, "rb"))
 
 
-def load_policies(all_attrs, possible_bids, max_T):
+def load_policies(puids, all_attrs, possible_bids, max_T):
     """
     loads policies from individual .py files. See policy_loader for more info
 
     :return: policy object list, policy-unique-id (puid) string list
     """
-    pols = [pol(all_attrs, possible_bids, max_T) for pol in get_pols()]
-    return pols, get_puids()
+    pols = [pol(all_attrs, possible_bids, max_T) for pol in get_pols(puids)]
+    return pols
 
 
 def get_click_prob(theta, bid):
