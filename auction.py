@@ -5,6 +5,7 @@ Donghun Lee 2018
 """
 
 from itertools import product
+import os
 
 import numpy as np
 
@@ -16,8 +17,8 @@ class Auction:
 
     """
     @staticmethod
-    def read_init_xlsx(fname):
-        wb = load_workbook("auction_ini_01.xlsx")
+    def read_init_xlsx(fname="auction_ini_01.xlsx"):
+        wb = load_workbook(os.path.dirname(__file__) + os.sep + fname)
         ws = wb.active
 
         param = {}

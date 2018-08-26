@@ -7,7 +7,7 @@ import pickle
 
 import numpy as np
 
-from policy_loader import get_pols, get_puids
+from .policy_loader import get_pols, get_puids
 
 
 def load_auction_p(fname):

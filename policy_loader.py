@@ -7,20 +7,21 @@ by Donghun Lee 2018
 """
 
 import csv
+import os
 from importlib import import_module
-
+from itertools import repeat
 
 def get_pols():
     puids = get_puids()
-    mod_names = ["Policies" + "." + puid for puid in puids]
+    mod_names = [".Policies" + "." + puid for puid in puids]
     pol_names = ["Policy_" + puid for puid in puids]
-    mods = list(map(import_module, mod_names))
+    mods = list(map(import_module, mod_names, repeat("Simulator")))
     pol_ptr = [getattr(mod, pol) for mod, pol in zip(mods, pol_names)]
     return pol_ptr
 
 
 def get_puids():
-    with open("puid_list.csv") as ifh:
+    with open(os.path.dirname(__file__) + os.sep + "puid_list.csv") as ifh:
         reader = csv.reader(ifh)
         puids = [fn[0] for fn in reader]
     return puids

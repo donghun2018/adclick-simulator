@@ -12,8 +12,8 @@ import numpy as np
 import time
 from openpyxl import Workbook
 
-from auction import Auction
-import sim_lib as sl
+from .auction import Auction
+from . import sim_lib as sl
 
 
 class Simulator:
@@ -26,11 +26,12 @@ class Simulator:
 
         :param randseed: seed for the simulator. it is used for click and conversion sampling and tiebreaking
         """
+        self.randseed = randseed
         self.time_last = time.time()
         self.prng = np.random.RandomState(randseed)
         self.pols, self.puids = None, None
         self.possible_bids = list(range(10))
-        self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
+        # self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
         self.num_of_ad_slots = 8
         self.ad_slot_click_prob_adjuster = []
         self.auctions = None
@@ -327,12 +328,13 @@ class Simulator:
                 ws.append([p_info[k] if not isinstance(p_info[k], tuple) else str(p_info[k]) for k in outs])
         wb.save(fname)
 
-
-    def output_all(self):
-        self.output_hist_to_xlsx("output_master_aggregate.xlsx")
+    def output_all(self, prefix=None):
+        if prefix is None:
+            prefix = "rs_{}_".format(self.randseed)
+        self.output_hist_to_xlsx(prefix+"output_master_aggregate.xlsx")
         for ix, puid in enumerate(self.puids):
-            self.output_policy_info_to_xlsx("output_policy_info_{}.xlsx".format(puid), ix)
-        self.output_time_logged_to_xlsx("output_time_spent_in_seconds.xlsx")
+            self.output_policy_info_to_xlsx(prefix+"output_policy_info_{}.xlsx".format(puid), ix)
+        self.output_time_logged_to_xlsx(prefix+"output_time_spent_in_seconds.xlsx")
 
 
 if __name__ == "__main__":
