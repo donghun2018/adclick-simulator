@@ -7,6 +7,7 @@ Donghun Lee 2018
 
 from copy import deepcopy
 from statistics import mean
+import dill as pickle
 
 import numpy as np
 import time
@@ -21,6 +22,9 @@ class Simulator:
     Simulates ad-click auction over time
     """
 
+    policy_outs = ['iter', 'attr', 'num_auct', 'your_bid', 'winning_bid', 'winning_bid_avg', 'num_impression', 'num_click',
+            'cost_per_click', 'num_conversion', 'revenue_per_conversion', 'your_profit_cumulative']
+
     def __init__(self, randseed=12345, **kwargs):
         """ initializes the auction simulating environment
 
@@ -32,6 +36,7 @@ class Simulator:
         self.pols = None
         self.puids = kwargs['puids'] if 'puids' in kwargs else None
         self.possible_bids = list(range(10))
+        self.possible_bids = np.arange(start=1, stop=10, step=1)
         # self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
         self.num_of_ad_slots = 8
         self.ad_slot_click_prob_adjuster = []
@@ -331,21 +336,33 @@ class Simulator:
 
         wb = Workbook()
         ws = wb.active
-        outs = ['iter', 'attr', 'num_auct', 'your_bid', 'winning_bid', 'winning_bid_avg', 'num_impression', 'num_click',
-                'cost_per_click', 'num_conversion', 'revenue_per_conversion', 'your_profit_cumulative']
+        outs = Simulator.policy_outs
         ws.append(outs)
         for p_info_iter in self.p_infos[pol_ix]:
             for p_info in p_info_iter:
                 ws.append([p_info[k] if not isinstance(p_info[k], tuple) else str(p_info[k]) for k in outs])
         wb.save(fname)
 
-    def output_all(self, prefix=None):
+    def output_all_xlsx(self, prefix=None):
         if prefix is None:
             prefix = "rs_{}_".format(self.randseed)
         self.output_hist_to_xlsx(prefix+"output_master_aggregate.xlsx")
         for ix, puid in enumerate(self.puids):
             self.output_policy_info_to_xlsx(prefix+"output_policy_info_{}.xlsx".format(puid), ix)
         self.output_time_logged_to_xlsx(prefix+"output_time_spent_in_seconds.xlsx")
+
+    def output_all_pickle(self, prefix=None):
+        if prefix is None:
+            prefix = "rs_{}_".format(self.randseed)
+        with open(prefix + "output_master_aggregate.pkl", "wb") as of1:
+            pickle.dump(self.hist, of1)
+        for ix, puid in enumerate(self.puids):
+            with open(prefix + "output_policy_info_{}.pkl".format(puid), "wb") as of2:
+                pickle.dump(self.p_infos[ix], of2)
+
+    def output_all(self, prefix=None):
+        # self.output_all_pickle()
+        self.output_all_xlsx()
 
 
 if __name__ == "__main__":
