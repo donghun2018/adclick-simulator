@@ -54,6 +54,7 @@ class Policy_RPC_L2L(L2LablePolicy):
         n = self.count[a_ix] + 1
         mu2 = 1/n * x + (n-1)/n * mu
         self.mu[a_ix] = mu2
+        self.count[a_ix] = n
 
 
     def _closest_ix_to_x(self, x, vec):
