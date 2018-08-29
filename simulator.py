@@ -35,6 +35,7 @@ class Simulator:
         self.prng = np.random.RandomState(randseed)
         self.pols = None
         self.puids = kwargs['puids'] if 'puids' in kwargs else None
+        self.policy_params = kwargs['policy_param'] if 'policy_param' in kwargs else None
         self.possible_bids = list(range(10))
         self.possible_bids = np.arange(start=1, stop=10, step=1)
         # self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
@@ -48,6 +49,8 @@ class Simulator:
         self.events = []
         self.p_infos = {}
         self.time_spent = {}
+
+
         self._time_log('simulator')
 
     def _time_log(self, n):
@@ -69,10 +72,9 @@ class Simulator:
         self.auctions = aucts
         self.attrs = sorted(list(set([a['attr'] for a in aucts])))
         self.max_t = self.auctions[-1]['iter']
-        self._init_pols()
-        if len(self.pols) < self.num_of_ad_slots:
-            print("number of policies less than number of ad slots. Reducing ad slot counts == number of policies = {}".format(len(self.pols)))
-            self.num_of_ad_slots = len(self.pols)
+
+        self.initialize_policies()
+
         click_prob_adjuster = [0.3 * (0.7 ** i) for i in range(self.num_of_ad_slots)]  # geometric decaying click prob adjustment
         self.ad_slot_click_prob_adjuster = [p / sum(click_prob_adjuster) for p in click_prob_adjuster]
         self._time_log('simulator')
@@ -88,7 +90,7 @@ class Simulator:
         if not self.puids:
             self.puids = sl.get_puids()
         if not self.pols:
-            self.pols = sl.load_policies(self.puids, self.attrs, self.possible_bids, self.max_t)
+            self.pols = sl.load_policies(self.puids, self.attrs, self.possible_bids, self.max_t, self.policy_params)
 
         self.p_infos = {ix: [] for ix in range(len(self.pols))}
         for puid in self.puids:
@@ -104,6 +106,12 @@ class Simulator:
         #     pass
 
         self._time_log('simulator')
+
+    def initialize_policies(self):
+        self._init_pols()
+        if len(self.pols) < self.num_of_ad_slots:
+            print("number of policies less than number of ad slots. Reducing ad slot counts == number of policies = {}".format(len(self.pols)))
+            self.num_of_ad_slots = len(self.pols)
 
     def get_num_clicks(self, bid, auct):
         theta = {'a': auct['theta'],

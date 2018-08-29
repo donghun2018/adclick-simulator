@@ -19,14 +19,17 @@ def load_auction_p(fname):
     """
     return pickle.load(open(fname, "rb"))
 
-
-def load_policies(puids, all_attrs, possible_bids, max_T):
+def load_policies(puids, all_attrs, possible_bids, max_T, policy_params=None):
     """
     loads policies from individual .py files. See policy_loader for more info
 
     :return: policy object list, policy-unique-id (puid) string list
     """
-    pols = [pol(all_attrs, possible_bids, max_T) for pol in get_pols(puids)]
+    sim_param = {'all_attrs': all_attrs,
+                 'possible_bids': possible_bids,
+                 'max_T': max_T}
+    pols = [pol(sim_param, policy_params[ix]) for ix, pol in enumerate(get_pols(puids))]
+
     return pols
 
 

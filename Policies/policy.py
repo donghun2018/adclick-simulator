@@ -12,7 +12,8 @@ import numpy as np
 
 class Policy():
 
-    def __init__(self, all_attrs, possible_bids=list(range(10)), max_t=10, randseed=12345):
+    def __init__(self, sim_param, policy_param=None):
+
         """
         initializes policy base class.
 
@@ -21,9 +22,10 @@ class Policy():
         :param max_t: maximum number of auction 'iter', or iteration timesteps
         :param randseed: random number seed.
         """
-        self.attrs = all_attrs
-        self.bid_space = possible_bids
-        self.max_t = max_t
+        self.attrs = sim_param['all_attrs']
+        self.bid_space = sim_param['possible_bids']
+        self.max_t = sim_param['max_T']
+        randseed = policy_param['randseed'] if 'randseed' in policy_param else 12345
         self.prng = np.random.RandomState(randseed)
 
     def bid(self, attr):
