@@ -29,6 +29,20 @@ class L2LablePolicy(Policy):
         self.L2L_score = [self.prng.rand() for _ in L2L_param_range]
         self.L2L_param = self.L2L_score.index(max(self.L2L_score))   # initialize L2L parameter
 
+    def set_L2L_param_by_ix(self, rho_ix):
+        """
+        sets L2L parameter by its index in L2L_param_range
+        :param rho_ix:
+        :return:
+        """
+        self.L2L_param = self.L2L_param_range[rho_ix]
+
+    def get_L2L_feedback(self):
+        """
+        returns g_hat := g(rho) sample for learning-to-learn algorithms
+        :return:
+        """
+
     def learnToLearn(self, rho, g_hat):
         """
         Code to learn from g(rho) =: g_hat sample.
