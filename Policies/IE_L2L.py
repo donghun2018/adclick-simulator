@@ -10,23 +10,24 @@ import numpy as np
 
 from .L2LablePolicy import L2LablePolicy
 
+
 class Policy_IE_L2L(L2LablePolicy):
 
-    def __init__(self, all_attrs, possible_bids=list(range(10)), max_t=10, ts_in_n=168, L2L_param_range=None, randseed=12345):
+    def __init__(self, all_attrs, possible_bids=list(range(10)), max_t=10, ts_in_n=168, rho_range=[0], randseed=12345):
         """
 
         :param all_attrs:
         :param possible_bids:
         :param max_t: large T
         :param ts_in_n: how many timesteps in one n
-        :param L2L_param_range: list of values, containing parameter candidates
+        :param rho_range: list of values, containing parameter candidates
         :param randseed:
         """
 
-        super().__init__(all_attrs, possible_bids, max_t, ts_in_n, L2L_param_range, randseed=randseed)
+        super().__init__(all_attrs, possible_bids, max_t, ts_in_n, rho_range, randseed=randseed)
 
         # initialize tunable parameter for learning to learn
-        self.rho = self.prng.choice(self.L2L_param_range)
+        self.rho = self.prng.choice(self.rho_range)
 
         # initialize estimates
         self.mu = []
@@ -50,7 +51,7 @@ class Policy_IE_L2L(L2LablePolicy):
         n = self.count[a_ix] + 1
         mu2 = 1/n * x + (n-1)/n * mu
 
-        sumsq2 = self.sumsq + (x - mu) * (x - mu2)
+        sumsq2 = self.sumsq[a_ix] + (x - mu) * (x - mu2)
 
         self.mu[a_ix] = mu2
         self.sumsq[a_ix] = sumsq2
@@ -93,6 +94,8 @@ class Policy_IE_L2L(L2LablePolicy):
         :return: does not matter
         """
 
+        super().learn(info)
+
         for result in info:
             if result['revenue_per_conversion'] == '':
                 continue
@@ -101,22 +104,3 @@ class Policy_IE_L2L(L2LablePolicy):
             self._update_estimates(attr, revenue_per_click)
 
         return True
-
-    def learnToLearn(self, rho, g_hat):
-        """
-        learn from g(rho) =: g_hat sample.
-
-        :param rho:
-        :param g_hat:
-        :return:
-        """
-        rho_ix = self.L2L_param_range.index(rho)
-        self.L2L_score[rho_ix] = g_hat
-
-    def update_L2L_param(self):
-        """
-        Updates new L2L parameter internally.
-        Must be called for L2L to have effect on policy parameters
-        :return:
-        """
-        self.L2L_param = self.L2L_score.index(max(self.L2L_score))
