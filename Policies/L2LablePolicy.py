@@ -56,7 +56,6 @@ class L2LablePolicy(Policy):
             if result['num_conversion'] != 0:
                 revenue = result['num_conversion'] * result['revenue_per_conversion']
             profit += revenue - cost
-        self._record_g_hat(profit)
         self.sum_C += profit
         self.sum_C_count += 1
 
@@ -82,7 +81,6 @@ class L2LablePolicy(Policy):
         """
 
         super().learn(info)
-
-
+        self._record_g_hat(info)
 
         return True

@@ -19,7 +19,7 @@ def load_auction_p(fname):
     """
     return pickle.load(open(fname, "rb"))
 
-def load_policies(puids, all_attrs, possible_bids, max_T, policy_params=None):
+def load_policies(puids, all_attrs, possible_bids, max_T, policy_params=None, l2l_params=None):
     """
     loads policies from individual .py files. See policy_loader for more info
 
@@ -28,7 +28,11 @@ def load_policies(puids, all_attrs, possible_bids, max_T, policy_params=None):
     sim_param = {'all_attrs': all_attrs,
                  'possible_bids': possible_bids,
                  'max_T': max_T}
-    pols = [pol(sim_param, policy_params[ix]) for ix, pol in enumerate(get_pols(puids))]
+    if l2l_params is None:
+        pols = [pol(sim_param, policy_params[ix], l2l_params[ix]) for ix, pol in enumerate(get_pols(puids))]
+
+    else:
+        pols = [pol(sim_param, policy_params[ix], l2l_params[ix]) for ix, pol in enumerate(get_pols(puids))]
 
     return pols
 

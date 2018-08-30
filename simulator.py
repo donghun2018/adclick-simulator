@@ -36,6 +36,7 @@ class Simulator:
         self.pols = None
         self.puids = kwargs['puids'] if 'puids' in kwargs else None
         self.policy_params = kwargs['policy_param'] if 'policy_param' in kwargs else None
+        self.l2l_params = kwargs['l2l_param'] if 'l2l_param' in kwargs else None
         self.possible_bids = list(range(10))
         self.possible_bids = np.arange(start=1, stop=10, step=1)
         # self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
@@ -90,7 +91,7 @@ class Simulator:
         if not self.puids:
             self.puids = sl.get_puids()
         if not self.pols:
-            self.pols = sl.load_policies(self.puids, self.attrs, self.possible_bids, self.max_t, self.policy_params)
+            self.pols = sl.load_policies(self.puids, self.attrs, self.possible_bids, self.max_t, self.policy_params, self.l2l_params)
 
         self.p_infos = {ix: [] for ix in range(len(self.pols))}
         for puid in self.puids:
