@@ -28,7 +28,6 @@ class Policy_UCB1_L2L(Policy_EPM_L2L):
 
         super().__init__(sim_param, policy_param, l2l_param)
 
-
         # initialize estimates
         self._init_counters()
         self._init_profit_estimate()
@@ -51,7 +50,7 @@ class Policy_UCB1_L2L(Policy_EPM_L2L):
         :param attr: attribute tuple. guaranteed to be found in self.attrs
         :return: a value that is found in self.bid_space
         """
-        if self.flag_init_incomplete[attr] is True:
+        if self.policy_param['verbatim_UCB1'] is True and self.flag_init_incomplete[attr] is True:
             prev_counts = self.verbatim_init_count[attr]
             never_tried_bid_ixs = [i for i in range(len(self.bid_space)) if prev_counts[i] == 0]
             if len(never_tried_bid_ixs) > 0:

@@ -22,7 +22,7 @@ class Policy_EPM_L2L(L2LablePolicy):
 
         super().__init__(sim_param, policy_param, l2l_param)
         self.policy_param = policy_param
-        self.policy_param['force_initial_exploration'] = True
+        self.policy_param['force_initial_exploration'] = False
         self.policy_param['random_tiebreak'] = True
 
         # initialize estimates

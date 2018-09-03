@@ -28,68 +28,63 @@ class Policy_IE_L2L(Policy_EPM_L2L):
         super().__init__(sim_param, policy_param, l2l_param)
 
         # initialize estimates
-        self._init_rpc_stdev_estimate()
+        self._init_counters()
+        self._init_profit_estimate_sumsq()
 
-    def _init_rpc_stdev_estimate(self):
-        self.sumsq = []
-        for ix in range(len(self.attrs)):
-            init_sumsq = self.prng.choice(self.bid_space)
-            self.sumsq.append(init_sumsq)
+    def _init_profit_estimate_sumsq(self):
+        self.profit_sumsq = []
+        for a in self.attrs:
+            self.profit_sumsq.append([0.0 for _ in self.bid_space])
 
-    def _update_estimates(self, attr, x):
-        """
-        iterative averaging of samples
-        :param attr: attribute
-        :param x: sample observed
-        :return: None
-        """
-        a_ix = self.attrs.index(attr)
-        mu = self.mu[a_ix]
-        n = self.count[a_ix] + 1
-        mu2 = 1/n * x + (n-1)/n * mu
-
-        sumsq2 = self.sumsq[a_ix] + (x - mu) * (x - mu2)
-
-        self.mu[a_ix] = mu2
-        self.sumsq[a_ix] = sumsq2
-        self.count[a_ix] = n
+    def _get_profit_est_and_stdev(self, x_ix, a_ix):
+        profit = self.profit[a_ix][x_ix]
+        n = self.n_counter[a_ix][x_ix]
+        if n < 2:
+            profit_stdev = 0.0
+        else:
+            profit_stdev = np.sqrt(self.profit_sumsq[a_ix][x_ix] / n)
+        return profit, profit_stdev
 
     def bid(self, attr):
         """
-        finds a bid using interval estimation
+        finds a bid using UCB1 algorithm
 
         :param attr: attribute tuple. guaranteed to be found in self.attrs
         :return: a value that is found in self.bid_space
         """
+
         a_ix = self.attrs.index(attr)
-        est_mean = self.mu[a_ix]
-        if self.count[a_ix] != 0:
-            est_stdev = np.sqrt(self.sumsq[a_ix] / self.count[a_ix])
+
+        score = []
+        for x_ix, x in enumerate(self.bid_space):
+            est_profit, profit_stdev = self._get_profit_est_and_stdev(x_ix, a_ix)
+            score.append(est_profit + self.rho * profit_stdev)
+
+        if self.policy_param['random_tiebreak'] is True:
+            bid_ix, ties = Policy_EPM_L2L._argmaxr(score, self.prng)
         else:
-            est_stdev = 0
-        bid = est_mean + self.rho * est_stdev
-        closest_bid = self.bid_space[self._closest_ix_to_x(bid, self.bid_space)]
-        return closest_bid
+            bid_ix = score.index(max(score))
+        return bid_ix
 
-    def learn(self, info):
+    def _update_profit_estimate(self, bid, attr, profit):
         """
-        learns from auctions results
-
-        In this sample policy, it learns by keeping track of sample averages of revenue from auctions of each attribute.
-        If 'revenue_per_conversion' is empty, that means I did not get any conversions in those auctions. I ignore them.
-
-        :param info: list of results. Single result is an aggregate outcome for all auctions with a particular attr.
-                     Follows the same format as output_policy_info_?????.xlsx
-        :return: does not matter
+        iterative averaging of samples
+        :param attr: attribute
+        :param y_hat: sample observed
+        :return: None
         """
+        a_ix = self.attrs.index(attr)
+        x_ix = self.bid_space.index(bid)
+        n = self.n_counter[a_ix][x_ix]
+        mu = self.profit[a_ix][x_ix]
 
-        super().learn(info)
+        if n == 0:
+            mu2 = profit
+            sumsq2 = 0.0
+        else:
+            mu2 = n / (n+1) * mu + 1 / (n+1) * profit
+            sumsq2 = self.profit_sumsq[a_ix][x_ix] + (profit - mu) * (profit - mu2)
 
-        for result in info:
-            if result['revenue_per_conversion'] == '':
-                continue
-            attr = result['attr']
-            revenue_per_click = result['revenue_per_conversion'] / result['num_click']
-            self._update_estimates(attr, revenue_per_click)
-
-        return True
+        self.profit[a_ix][x_ix] = mu2
+        self.profit_sumsq[a_ix][x_ix] = sumsq2
+        self.n_counter[a_ix][x_ix] = n + 1
