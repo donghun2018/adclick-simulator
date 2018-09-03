@@ -8,11 +8,10 @@ bids [rpc_mean] + rho [rpc_stdev]
 
 import numpy as np
 
-from .EPM_L2L import Policy_EPM_L2L
 from .RPC_L2L import Policy_RPC_L2L
 
 
-class Policy_IE_L2L(Policy_EPM_L2L):
+class Policy_IEold_L2L(Policy_RPC_L2L):
 
     def __init__(self, sim_param, policy_param=None, l2l_param=None): #all_attrs, possible_bids=list(range(10)), max_t=10, ts_in_n=168, rho_range=[0.01], randseed=12345):
         """

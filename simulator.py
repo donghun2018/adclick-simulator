@@ -37,7 +37,7 @@ class Simulator:
         self.policy_params = kwargs['policy_param'] if 'policy_param' in kwargs else None
         self.l2l_params = kwargs['l2l_param'] if 'l2l_param' in kwargs else None
         self.possible_bids = list(range(10))
-        self.possible_bids = np.around(np.arange(start=0.1, stop=10, step=0.1), decimals=1)
+        # self.possible_bids = np.around(np.arange(start=0.0, stop=10, step=0.1), decimals=1).tolist()
         # self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
         self.num_of_ad_slots = 3
         self.ad_slot_click_prob_adjuster = []
@@ -111,7 +111,7 @@ class Simulator:
         self._init_pols()
         if len(self.pols) < self.num_of_ad_slots:
             print("number of policies less than number of ad slots. Reducing ad slot counts == number of policies = {}".format(len(self.pols)))
-            self.num_of_ad_slots = len(self.pols)
+            self.num_of_ad_slots = len(self.pols) - 1
 
     def get_num_clicks(self, bid, auct):
         theta = {'a': auct['theta'],
