@@ -370,7 +370,7 @@ class Simulator:
 
     def output_all(self, prefix=None):
         # self.output_all_pickle()
-        self.output_all_xlsx()
+        self.output_all_xlsx(prefix)
 
 
 if __name__ == "__main__":
