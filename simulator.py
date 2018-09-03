@@ -7,7 +7,6 @@ Donghun Lee 2018
 
 from copy import deepcopy
 from statistics import mean
-import dill as pickle
 
 import numpy as np
 import time
@@ -38,9 +37,9 @@ class Simulator:
         self.policy_params = kwargs['policy_param'] if 'policy_param' in kwargs else None
         self.l2l_params = kwargs['l2l_param'] if 'l2l_param' in kwargs else None
         self.possible_bids = list(range(10))
-        self.possible_bids = np.arange(start=1, stop=10, step=1)
+        self.possible_bids = np.around(np.arange(start=0.1, stop=10, step=0.1), decimals=1)
         # self.possible_bids = list([v / 10 for v in range(100)])  # use python primitive types instead of numpy
-        self.num_of_ad_slots = 8
+        self.num_of_ad_slots = 3
         self.ad_slot_click_prob_adjuster = []
         self.auctions = None
         self.attrs = []

@@ -62,7 +62,10 @@ class Policy_IE_L2L(Policy_RPC_L2L):
         """
         a_ix = self.attrs.index(attr)
         est_mean = self.mu[a_ix]
-        est_stdev = np.sqrt(self.sumsq[a_ix] / self.count[a_ix])
+        if self.count[a_ix] != 0:
+            est_stdev = np.sqrt(self.sumsq[a_ix] / self.count[a_ix])
+        else:
+            est_stdev = 0
         bid = est_mean + self.rho * est_stdev
         closest_bid = self.bid_space[self._closest_ix_to_x(bid, self.bid_space)]
         return closest_bid

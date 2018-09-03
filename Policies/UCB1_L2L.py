@@ -26,6 +26,7 @@ class Policy_UCB1_L2L(Policy_RPC_L2L):
 
         # initialize estimates
         self._init_rpc_mean_estimate()
+        policy_param['verbatim_UCB1'] = True
         if policy_param['verbatim_UCB1'] is True:
             self.flag_init_incomplete = {a: True for a in self.attrs}
             self.verbatim_init_count = {a: [0] * len(self.bid_space) for a in self.attrs}

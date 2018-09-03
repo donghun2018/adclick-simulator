@@ -28,11 +28,13 @@ def load_policies(puids, all_attrs, possible_bids, max_T, policy_params=None, l2
     sim_param = {'all_attrs': all_attrs,
                  'possible_bids': possible_bids,
                  'max_T': max_T}
-    if l2l_params is None:
-        pols = [pol(sim_param, policy_params[ix], l2l_params[ix]) for ix, pol in enumerate(get_pols(puids))]
 
+    if l2l_params is None:
+        pols = [pol(sim_param, policy_params[ix]) for ix, pol in enumerate(get_pols(puids))]
     else:
         pols = [pol(sim_param, policy_params[ix], l2l_params[ix]) for ix, pol in enumerate(get_pols(puids))]
+
+
 
     return pols
 
