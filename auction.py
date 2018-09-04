@@ -58,12 +58,12 @@ class Auction:
                 # generates [-0.75,0.75] bounded scaled beta(2,2) random variable
                 a['theta'] = list(-0.75 + 1.5 * self.prng.beta(2,2,size=len(a['values'])))
             if a['avg-revenue'] == 'random':
-                # generates [30, 50] bounded scaled beta(2,2) random variable (after all attributes considered)
-                # this makes avg rev per conversion 40.
-                a['avg-revenue'] = list(30 / len(attrs_input) + 50 / len(attrs_input) * self.prng.beta(2,2,size=len(a['values'])))
+                # generates [30, 60] bounded scaled beta(2,2) random variable (after all attributes considered)
+                # this makes avg rev per conversion 45.
+                a['avg-revenue'] = list(30 / len(attrs_input) + 60 / len(attrs_input) * self.prng.beta(2,2,size=len(a['values'])))
             if a['prob-conversion'] == 'random':
                 # generates [0, 0.15/len-attr] bounded scaled beta(2,2) r.v. to limit prob-conversion capped at 0.15
-                a['prob-conversion'] = list(0 + 0.125 / len(attrs_input) * self.prng.beta(2,2,size=len(a['values'])))
+                a['prob-conversion'] = list(0 + 0.1 / len(attrs_input) * self.prng.beta(2,2,size=len(a['values'])))
 
         return attrs_input
 

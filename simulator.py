@@ -314,19 +314,19 @@ class Simulator:
         :param pol_name: if not provided, prints master version.
         :return:
         """
-        wb = Workbook()
-        ws = wb.active
+        wb = Workbook(write_only=True)
+        ws = wb.create_sheet()
         outs = ['iter', 'attr', 'lambda', 'num_auct', 'bids', 'theta', 'p_click', 'num_click', 'cost_per_click',
                 'num_conversion', 'revenue_per_conversion', 'costs_cumulative', 'revenues_cumulative', 'profits_cumulative']
-        ws.append(outs),
+        ws.append(outs)
         for h in self.hist:
             ws.append([str(h[k]) if isinstance(h[k], (list, tuple)) else h[k] for k in outs])
             # ws.append([str(['{:.2f}'.format(i) for i in h[k] ]) if isinstance(h[k], (list, tuple)) else '{:.2f}'.format(h[k]) for k in outs])
         wb.save(fname)
 
     def output_time_logged_to_xlsx(self, fname):
-        wb = Workbook()
-        ws = wb.active
+        wb = Workbook(write_only=True)
+        ws = wb.create_sheet()
         outs = ['simulator'] + self.puids
         ws.append(['t_{}'.format(k) for k in outs])
         for h in self.hist:
@@ -342,8 +342,8 @@ class Simulator:
         :return:
         """
 
-        wb = Workbook()
-        ws = wb.active
+        wb = Workbook(write_only=True)
+        ws = wb.create_sheet()
         outs = Simulator.policy_outs
         ws.append(outs)
         for p_info_iter in self.p_infos[pol_ix]:
