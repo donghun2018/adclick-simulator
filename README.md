@@ -1,6 +1,11 @@
 # adclick-simulator
 
-This is an Ad-click Auction Simulator that takes multiple bidding policies and emulate running 2nd price auction for sponsored search advertisement placing similar to Google's Ad-click system.
+This is a fully agent-based sponsored search auction (SSA) simulator.
+The simulator takes multiple bidding policies as agents participating in the auctions, and emulates 2nd price auction for sponsored search advertisement placing similar to Google's Ad-click system.
+
+This simulator has been utilized in the following publications and educational projects:
+- Optimal Learning (ORF 418) class offered in Princeton University. Spring 2018 semester. [Course Webpage](https://castlelab.princeton.edu/orf-418/)
+- Meta-learning of Bidding Agent with Knowledge Gradientin a Fully Agent-based Sponsored Search Auction Simulator, AAMAS 2019 [PDF](http://www.ifaamas.org/Proceedings/aamas2019/pdfs/p2090.pdf)
 
 ## Get the Newest Code
 
@@ -67,6 +72,7 @@ Now you have a running simulator, and you may add your policies by adding a new 
 ### Other documents
 
 - An introductory slideshow PDF file is available [here](https://github.com/donghun2018/adclick-simulator/blob/master//documentation/20180411_Ad-click_simulator_intro_r1.pdf)
+  - This material is used as a guide to a Princeton undergraduate class offered in 2018.
 
 ## Contributing
 
@@ -78,7 +84,7 @@ Please see [VERSION.md](https://github.com/donghun2018/adclick-simulator/blob/ma
 
 ## Authors
 
-- Donghun Lee: created *initial version*
+- Donghun Lee (d.lee at princeton dot edu): created *initial version*
 
 See also the list of [contributors](https://github.com/donghun2018/adclick-simulator/contributors) who participated in this project.
 
